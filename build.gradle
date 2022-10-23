@@ -1,0 +1,47 @@
+plugins {
+    id 'org.springframework.boot' version '2.7.3'
+    id 'io.spring.dependency-management' version '1.0.13.RELEASE'
+    id 'java'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    maven { url 'https://repo.spring.io/release' }
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.hibernate.reactive:hibernate-reactive-core:1.1.9.Final'
+    implementation 'io.smallrye.reactive:mutiny-reactor:1.7.0'
+    implementation 'io.vertx:vertx-pg-client:4.3.4'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'io.projectreactor:reactor-test'
+    // https://mvnrepository.com/artifact/com.ongres.scram/common
+    // postgres driver bug demands this. fixed in newer jdbc drivers, but no r2dbc apparently
+    implementation group: 'com.ongres.scram', name: 'common', version: '2.1'
+    // https://mvnrepository.com/artifact/com.ongres.scram/client
+    implementation group: 'com.ongres.scram', name: 'client', version: '2.1'
+
+
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+tasks.named('bootBuildImage') {
+    builder = 'paketobuildpacks/builder:tiny'
+    environment = ['BP_NATIVE_IMAGE': 'true']
+}
